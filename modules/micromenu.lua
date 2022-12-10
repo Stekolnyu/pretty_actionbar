@@ -21,20 +21,20 @@ local bagslots = {
     _G.CharacterBag2Slot,
     _G.CharacterBag3Slot
 };
-local MICRO_BUTTONS = {
-	_G.CharacterMicroButton,
-	_G.SpellbookMicroButton,
-	_G.TalentMicroButton,
-	_G.AchievementMicroButton,
-	_G.QuestLogMicroButton,
-	_G.GuildMicroButton,
-	_G.SocialsMicroButton,
-	_G.LFDMicroButton,
-	_G.CollectionsMicroButton,
-	_G.EncounterJournalMicroButton,
-	_G.StoreMicroButton,
-	_G.MainMenuMicroButton,
-};
+local MICRO_BUTTONS = SHARED_MICROMENU_BUTTONS
+-- 	_G.CharacterMicroButton,
+-- 	_G.SpellbookMicroButton,
+-- 	_G.TalentMicroButton,
+-- 	_G.AchievementMicroButton,
+-- 	_G.QuestLogMicroButton,
+-- 	_G.GuildMicroButton,
+-- 	_G.SocialsMicroButton,
+-- 	_G.LFDMicroButton,
+-- 	_G.CollectionsMicroButton,
+-- 	_G.EncounterJournalMicroButton,
+-- 	_G.StoreMicroButton,
+-- 	_G.MainMenuMicroButton,
+-- };
 local pUiBagsBar = CreateFrame(
 	'Frame',
 	'pUiBagsBar',
@@ -286,38 +286,71 @@ local function setupMicroButtons(xOffset)
 	menu:SetScale(config.micromenu.scale_menu)
 	menu:SetSize(10, 10)
 	menu:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMRIGHT', xOffset, config.micromenu.y_position)
+	CharacterMicroButton:SetDisabledTexture(nil) -- doesn't exist by default
 	for _,button in pairs(MICRO_BUTTONS) do
+		button = _G[button]
+
 		local buttonName = button:GetName():gsub('MicroButton', '')
 		local name = strlower(buttonName);
 
 		button:texture_strip()
 
-		CharacterMicroButton:SetDisabledTexture'' -- doesn't exist by default
+		-- if button:GetName() == "Collections" then
+		-- 	CollectionsMicroButton.SetButtonState = nil
+		-- end
 		-- PVPMicroButton:SetDisabledTexture'' -- doesn't exist by default
 		-- PVPMicroButton:GetDisabledTexture():set_atlas('ui-hud-micromenu-pvp-disabled-2x')
-		
+
 		button:SetParent(pUiMicroMenu)
 		-- button:SetScale(1.4)
 		button:SetSize(14, 19)
 		button:SetClearPoint('BOTTOMLEFT', pUiMicroMenu, 'BOTTOMRIGHT', buttonxOffset, 55)
 		button.SetPoint = addon._noop
 		button:SetHitRectInsets(0,0,0,0)
+		local normal, pushed, disabled,high = button:GetNormalTexture(),button:GetPushedTexture(), button:GetDisabledTexture(),button:GetHighlightTexture()
 
-		button:GetNormalTexture():set_atlas('ui-hud-micromenu-'..name..'-up-2x')
-		button:GetPushedTexture():set_atlas('ui-hud-micromenu-'..name..'-down-2x')
-		button:GetDisabledTexture():set_atlas('ui-hud-micromenu-'..name..'-disabled-2x')
-		button:GetHighlightTexture():set_atlas('ui-hud-micromenu-'..name..'-mouseover-2x')
+		if normal then
+			normal:set_atlas('ui-hud-micromenu-'..name..'-up-2x')
+		end
+		if pushed then
+			pushed:set_atlas('ui-hud-micromenu-'..name..'-down-2x')
+		end
+		if disabled then
+			disabled:set_atlas('ui-hud-micromenu-'..name..'-disabled-2x')
+		end
+		if high then
+			high:set_atlas('ui-hud-micromenu-'..name..'-mouseover-2x')
+		end
+
 		button:GetHighlightTexture():SetBlendMode('ADD')
 
 		buttonxOffset = buttonxOffset + 15
 	end
 end
 
+CollectionsMicroButton:HookScript("OnUpdate",function(self,delay)
+	local button = CollectionsMicroButton
+	local normal, pushed, disabled,high = button:GetNormalTexture(),button:GetPushedTexture(), button:GetDisabledTexture(),button:GetHighlightTexture()
+	local name = "collections"
+	if normal then
+		normal:set_atlas('ui-hud-micromenu-'..name..'-up-2x')
+	end
+	if pushed then
+		pushed:set_atlas('ui-hud-micromenu-'..name..'-down-2x')
+	end
+	if disabled then
+		disabled:set_atlas('ui-hud-micromenu-'..name..'-disabled-2x')
+	end
+	if high then
+		high:set_atlas('ui-hud-micromenu-'..name..'-mouseover-2x')
+	end
+end)
+
+
 addon.package:RegisterEvents(function()
 	local xOffset
 	xOffset = -180
 	_G.CollectionsMicroButton:UnregisterEvent('UPDATE_BINDINGS')
-	print("COL")
 	setupMicroButtons(xOffset + config.micromenu.x_position);
 	if config.micromenu.hide_on_vehicle then
 		RegisterStateDriver(pUiMicroMenu, 'visibility', '[vehicleui] hide;show')

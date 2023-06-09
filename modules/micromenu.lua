@@ -294,7 +294,7 @@ local function setupMicroButtons(xOffset)
 		local name = strlower(buttonName);
 
 		button:texture_strip()
-
+		
 		-- if button:GetName() == "Collections" then
 		-- 	CollectionsMicroButton.SetButtonState = nil
 		-- end
@@ -309,6 +309,7 @@ local function setupMicroButtons(xOffset)
 		button:SetHitRectInsets(0,0,0,0)
 		local normal, pushed, disabled,high = button:GetNormalTexture(),button:GetPushedTexture(), button:GetDisabledTexture(),button:GetHighlightTexture()
 
+		
 		if normal then
 			normal:set_atlas('ui-hud-micromenu-'..name..'-up-2x')
 		end
@@ -325,13 +326,19 @@ local function setupMicroButtons(xOffset)
 		button:GetHighlightTexture():SetBlendMode('ADD')
 
 		buttonxOffset = buttonxOffset + 15
+
+		if button == SocialsMicroButton then
+			_G.SocialsMicroButton:Hide()
+			buttonxOffset = buttonxOffset - 15
+		end
 	end
 end
 
-CollectionsMicroButton:HookScript("OnUpdate",function(self,delay)
+CollectionsMicroButton:HookScript("OnUpdate",function(self,delay)	--Простите я слабый
 	local button = CollectionsMicroButton
 	local normal, pushed, disabled,high = button:GetNormalTexture(),button:GetPushedTexture(), button:GetDisabledTexture(),button:GetHighlightTexture()
 	local name = "collections"
+
 	if normal then
 		normal:set_atlas('ui-hud-micromenu-'..name..'-up-2x')
 	end
@@ -346,11 +353,30 @@ CollectionsMicroButton:HookScript("OnUpdate",function(self,delay)
 	end
 end)
 
+GuildMicroButton:HookScript("OnUpdate",function(self,delay)		--Простите я слабый
+	local button = GuildMicroButton
+	local normal, pushed, disabled,high = button:GetNormalTexture(),button:GetPushedTexture(), button:GetDisabledTexture(),button:GetHighlightTexture()
+	local name = "guild"
+
+	if normal then
+		normal:set_atlas('ui-hud-micromenu-'..name..'-up-2x')
+	end
+	if pushed then
+		pushed:set_atlas('ui-hud-micromenu-'..name..'-down-2x')
+	end
+	if disabled then
+		disabled:set_atlas('ui-hud-micromenu-'..name..'-disabled-2x')
+	end
+	if high then
+		high:set_atlas('ui-hud-micromenu-'..name..'-mouseover-2x')
+	end
+end)
 
 addon.package:RegisterEvents(function()
 	local xOffset
 	xOffset = -180
 	_G.CollectionsMicroButton:UnregisterEvent('UPDATE_BINDINGS')
+	_G.GuildMicroButton:UnregisterEvent('UPDATE_BINDINGS')
 	setupMicroButtons(xOffset + config.micromenu.x_position);
 	if config.micromenu.hide_on_vehicle then
 		RegisterStateDriver(pUiMicroMenu, 'visibility', '[vehicleui] hide;show')
